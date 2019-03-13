@@ -1,7 +1,6 @@
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
-import 'package:angular_components/material_expansionpanel/material_expansionpanel_auto_dismiss.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
 @Component(
@@ -13,7 +12,6 @@ import 'package:angular_components/material_expansionpanel/material_expansionpan
     MaterialFabComponent,
     MaterialButtonComponent,
     MaterialExpansionPanel,
-    MaterialExpansionPanelAutoDismiss,
     MaterialExpansionPanelSet,
     MaterialIconComponent,
     materialInputDirectives,

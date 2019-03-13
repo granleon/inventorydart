@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
-import 'package:angular_components/material_expansionpanel/material_expansionpanel_auto_dismiss.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
 @Component(
@@ -15,19 +14,12 @@ import 'package:angular_components/material_expansionpanel/material_expansionpan
   templateUrl: 'item_create_component.html',
   directives: [
     MaterialButtonComponent,
-    MaterialCheckboxComponent,
     MaterialExpansionPanel,
-    MaterialExpansionPanelAutoDismiss,
     MaterialExpansionPanelSet,
     MaterialFabComponent,
     MaterialIconComponent,
     materialInputDirectives,
-    NgFor,
-    NgIf,
   ],
   providers: const <dynamic>[materialProviders],
 )
-class ItemCreateComponent implements OnInit {
-  @override
-  Future<Null> ngOnInit() async {}
-}
+class ItemCreateComponent {}
