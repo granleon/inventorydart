@@ -1,11 +1,25 @@
-<material-expansionpanel-set>
-  <material-expansionpanel name="Ordinary panel">
-    This is a normal panel with no frills.
+<material-expansionpanel-set *ngIf="items.isEmpty">
+  <material-expansionpanel
+    disabled
+    [expanded]="true"
+    [hideExpandedHeader]="true"
+    [showSaveCancel]="false"
+  >
+    Nothing to do! Add items above.
   </material-expansionpanel>
-  <material-expansionpanel name="Ordinary panel">
-    This is a normal panel with no frills.
-  </material-expansionpanel>
-  <material-expansionpanel name="Ordinary panel">
-    This is a normal panel with no frills.
+</material-expansionpanel-set>
+
+<material-expansionpanel-set *ngIf="items.isNotEmpty">
+  <material-expansionpanel
+    *ngFor="let item of items"
+    name="{{ item.productname }}"
+    saveText="Details"
+    cancelText="Close"
+  >
+    Part Number: {{ item.partnumber }}
+    <br />
+    Lot Number: {{ item.lotnumber }}
+    <br />
+    Quantity Available: {{ item.quantity }}
   </material-expansionpanel>
 </material-expansionpanel-set>

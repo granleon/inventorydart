@@ -9,13 +9,9 @@ import 'package:angular_components/angular_components.dart';
   ],
   templateUrl: 'navbar_component.html',
   directives: [
-    MaterialCheckboxComponent,
-    MaterialFabComponent,
     MaterialButtonComponent,
     MaterialIconComponent,
     materialInputDirectives,
-    NgFor,
-    NgIf,
   ],
 )
 class NavbarComponent {}
