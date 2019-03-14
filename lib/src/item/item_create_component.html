@@ -5,16 +5,21 @@
     [hideExpandedHeader]="true"
     [showSaveCancel]="false"
   >
-    <material-input
-      id="barcode_input"
-      label="Scan Barcode"
-      autoFocus
-      floatingLabel
-    >
-    </material-input>
+    <form #itemForm="ngForm">
+      <material-input
+        autoFocus
+        label="Scan Barcode"
+        floatingLabel
+        ngControl="barcode"
+        name="barcode"
+        #barcode
+        style="width:90%"
+      >
+      </material-input>
 
-    <material-fab mini raised>
-      <material-icon icon="add"></material-icon>
-    </material-fab>
+      <material-fab mini raised (trigger)="addBarcode(itemForm)">
+        <material-icon icon="add"></material-icon>
+      </material-fab>
+    </form>
   </material-expansionpanel>
 </material-expansionpanel-set>
