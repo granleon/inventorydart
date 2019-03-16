@@ -19,10 +19,10 @@ CREATE TABLE IF NOT EXISTS qc.inventory (
 
 INSERT INTO qc.partnumbers (partnumber, chemistry, createdAt) VALUES 
   ('444444', 'ApoA', '2016-03-26 10:10:10-05:00'),
-  ('444445', 'ApoB', '2016-03-26');
+  ('444445', 'ApoB', '2016-03-28');
 
 INSERT INTO qc.inventory (lotnumber, createdAt, partnumberid) VALUES
   ( 'M808080', '2016-03-21 10:10:10-05:00', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444444' )),
+  ( 'M808081', '2016-03-22', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444444' )),
   ( 'M808081', '2016-03-22 10:10:10-05:00', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444444' )),
-  ( 'M808081', '2016-03-22 10:10:10-05:00', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444444' )),
-  ( 'M808082', '2016-03-23 10:10:10-05:00', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444445' ));
+  ( 'M808082', '2016-03-28', (SELECT id FROM qc.partnumbers AS pn WHERE pn.partnumber = '444445' ));
