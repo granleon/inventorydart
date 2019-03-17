@@ -1,44 +1,32 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/render"
-	_ "github.com/lib/pq"
-	"github.com/raion314/inventory/item"
+	"fmt"
+	"os"
+
+	"github.com/plleo/inventory/backend/app"
+	"github.com/plleo/inventory/backend/controllers"
+
+	"github.com/gorilla/mux"
 )
 
-// Routes comment
-func Routes() *chi.Mux {
-	router := chi.NewRouter()
-	router.Use(
-		render.SetContentType(render.ContentTypeJSON),
-		middleware.Logger,
-		middleware.DefaultCompress,
-		middleware.RedirectSlashes,
-		middleware.Recoverer,
-	)
-
-	router.Route("/v1", func(r chi.Router) {
-		r.Mount("/api/item", item.Routes())
-	})
-
-	return router
-}
-
 func main() {
-	router := Routes()
+	r := mux.NewRouter()
+	r.Use(app.JwtAuthentication)
 
-	walkFunc := func(method string, route string, handler http.Handler, middleware ...func(http.Handler) http.Handler) error {
-		log.Printf("%s %s\n", method, route)
-		return nil
-	}
-	if err := chi.Walk(router, walkFunc); err != nil {
-		log.Panicf("Logging err: %s\n", err.Error())
+	r.HandleFunc("/api/v1/user/new", controllers.CreateAccount).Methods("POST")
+	r.HandleFunc("/api/v1/user/login", controllers.AuthenticateAccount).Methods("POST")
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "9001"
 	}
 
-	log.Fatal(http.ListenAndServe(":7070", router))
+	fmt.Println(port)
+	err := http.ListenAndServe(":"+port, r)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
