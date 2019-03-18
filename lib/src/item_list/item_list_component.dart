@@ -13,7 +13,7 @@ import '../../src/item_service.dart';
   styleUrls: ['item_list_component.css'],
   templateUrl: 'item_list_component.html',
   directives: [
-    MaterialCheckboxComponent,
+    coreDirectives,
     MaterialFabComponent,
     MaterialButtonComponent,
     MaterialExpansionPanel,
@@ -23,22 +23,21 @@ import '../../src/item_service.dart';
     NgFor,
     NgIf,
   ],
-  providers: const <dynamic>[materialProviders],
 )
-class ItemListComponent implements OnDestroy {
+class ItemListComponent implements OnDestroy, OnInit {
   final ItemListService _itemListService;
   StreamSubscription _itemsSubscription;
   List<Item> itemsList = [];
 
   ItemListComponent(this._itemListService);
 
-  void onActivate() {
+  @override
+  void ngOnInit() {
     _itemListService.getAllItems();
     _itemsSubscription = _itemListService.getItemUpdateListener
         .listen((List<Item> items) => itemsList = items);
   }
 
-  @override
   void ngOnDestroy() {
     _itemsSubscription.cancel();
   }
