@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
 import '../../src/item_model.dart';
+import '../../src/item_service.dart';
 
 @Component(
   selector: 'app-item-list',
@@ -22,9 +25,21 @@ import '../../src/item_model.dart';
   ],
   providers: const <dynamic>[materialProviders],
 )
-class ItemListComponent {
-  List<Item> items = [
-    Item('1', 'ApoA', '444444', 'M909090', 5),
-    Item('2', 'ApoB', '444445', 'M909091', 2)
-  ];
+class ItemListComponent implements OnDestroy {
+  final ItemListService _itemListService;
+  StreamSubscription _itemsSubscription;
+  List<Item> itemsList = [];
+
+  ItemListComponent(this._itemListService);
+
+  void onActivate() {
+    _itemListService.getAllItems();
+    _itemsSubscription = _itemListService.getItemUpdateListener
+        .listen((List<Item> items) => itemsList = items);
+  }
+
+  @override
+  void ngOnDestroy() {
+    _itemsSubscription.cancel();
+  }
 }
