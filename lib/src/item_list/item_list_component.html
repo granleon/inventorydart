@@ -1,4 +1,4 @@
-<material-expansionpanel-set *ngIf="items.isEmpty">
+<material-expansionpanel-set *ngIf="itemsList.isEmpty">
   <material-expansionpanel
     disabled
     [expanded]="true"
@@ -9,15 +9,13 @@
   </material-expansionpanel>
 </material-expansionpanel-set>
 
-<material-expansionpanel-set *ngIf="items.isNotEmpty">
+<material-expansionpanel-set *ngIf="itemsList.isNotEmpty">
   <material-expansionpanel
-    *ngFor="let item of items"
-    name="{{ item.productname }}"
+    *ngFor="let item of itemsList"
+    name="{{ item.chemabbr }}"
     saveText="Details"
     cancelText="Close"
   >
     Part Number: {{ item.partnumber }}
-    <br />
-    Quantity Available: {{ item.quantity }}
   </material-expansionpanel>
 </material-expansionpanel-set>
