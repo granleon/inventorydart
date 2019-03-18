@@ -6,7 +6,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
+
+	"github.com/gorilla/handlers"
 
 	"github.com/globalsign/mgo/bson"
 	"github.com/gorilla/mux"
@@ -110,13 +113,17 @@ func main() {
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	client, _ = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-
 	fmt.Println("Connected to MongoDB...")
+
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	headersOk := handlers.AllowedHeaders([]string{"Origin", "X-Requested-With", "Content-Type", "Accept"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/item/{id}", GetItem).Methods("GET")
 	router.HandleFunc("/api/v1/item", CreateItem).Methods("POST")
 	router.HandleFunc("/api/v1/item/{id}", UpdateItem).Methods("PATCH")
 	router.HandleFunc("/api/v1/item/{id}", DeleteItem).Methods("DELETE")
 	router.HandleFunc("/api/v1/item", GetItems).Methods("GET")
-	log.Fatal(http.ListenAndServe(":9001", router))
+	log.Fatal(http.ListenAndServe(":9001", handlers.LoggingHandler(os.Stdout, handlers.CORS(originsOk, headersOk, methodsOk)(router))))
 }
