@@ -8,7 +8,7 @@ import './item_model.dart';
 @Injectable()
 class ItemListService {
   final BrowserClient _http;
-  final baseurl = 'http://localhost:3000/api/itemss';
+  final baseurl = 'http://localhost:9001/api/v1/item';
   static final _headers = {'Content-Type': 'application/json; charset=UTF-8'};
   Item item;
   List<Item> _itemList = [];
