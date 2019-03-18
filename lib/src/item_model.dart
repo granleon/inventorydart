@@ -1,25 +1,28 @@
 class Item {
   String id;
-  String productname;
-  String partnumber;
   String lotnumber;
-  int quantity;
+  String partnumber;
+  String chem;
+  String chemabbr;
+  String expire;
 
-  Item(this.id, this.productname, this.partnumber, this.lotnumber,
-      this.quantity);
+  Item(this.id, this.lotnumber, this.partnumber, this.chem, this.chemabbr,
+      this.expire);
 
   factory Item.fromJson(Map<String, dynamic> item) => Item(
       item['id'],
-      item['productname'],
-      item['partnumber'],
       item['lotnumber'],
-      item['quantity']);
+      item['partnumber'],
+      item['chem'],
+      item['chemabbr'],
+      item['expire']);
 
   Map toJson() => {
         'id': id,
-        'productname': productname,
-        'partnumber': partnumber,
         'lotnumber': lotnumber,
-        'quantity': quantity
+        'partnumber': partnumber,
+        'chem': chem,
+        'chemabbr': chemabbr,
+        'expire': expire,
       };
 }
