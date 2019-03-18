@@ -30,7 +30,7 @@ class ItemCreateComponent {
   ItemCreateComponent(this._itemListService);
 
   void addBarcode(NgForm form) {
-    Item item = Item(null, null, null, null, null);
+    Item item = Item(null, null, null, null, null, null);
     _itemListService.createItem(item);
     form.reset();
   }
