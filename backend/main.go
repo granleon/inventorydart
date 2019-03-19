@@ -109,7 +109,7 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Starting the application....on port localhost:9000")
+	fmt.Println("Starting the application....on port localhost:9001/api/v1/item")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
 	client, _ = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
