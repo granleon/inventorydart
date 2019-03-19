@@ -30,7 +30,24 @@ class ItemCreateComponent {
   ItemCreateComponent(this._itemListService);
 
   void addBarcode(NgForm form) {
-    Item item = Item(null, null, null, null, null, null);
+    print(form.value);
+    // (01)15099590203344(11)161123(17)181130(10)M611410 // 49
+    // 18 = 10  = 10 = 11
+    // *+H628A409201E* // 15
+    // +$$3180331M609488F
+    String barcode1d = form.value["barcode1d"];
+    String barcode2d = form.value["barcode2d"];
+    // String unique = barcode2d.substring(5, 18);
+    // String mfgdate = barcode2d.substring(19, 29);
+    String expdate = barcode2d.substring(32, 38);
+    String lotnumber = barcode2d.substring(42, 49);
+    String partnumber = barcode1d.substring(6);
+
+    if (barcode1d.length != 49 || barcode2d.length != 15) {
+      form.reset();
+    }
+
+    Item item = Item(null, lotnumber, partnumber, null, null, expdate);
     _itemListService.createItem(item);
     form.reset();
   }
