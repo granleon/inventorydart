@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
 import '../../src/item_model.dart';
+import '../../src/item_service.dart';
 
 @Component(
   selector: 'app-item-list',
   styleUrls: ['item_list_component.css'],
   templateUrl: 'item_list_component.html',
   directives: [
-    MaterialCheckboxComponent,
+    coreDirectives,
     MaterialFabComponent,
     MaterialButtonComponent,
     MaterialExpansionPanel,
@@ -20,11 +23,22 @@ import '../../src/item_model.dart';
     NgFor,
     NgIf,
   ],
-  providers: const <dynamic>[materialProviders],
 )
-class ItemListComponent {
-  List<Item> items = [
-    Item('1', 'ApoA', '444444', 'M909090', 5),
-    Item('2', 'ApoB', '444445', 'M909091', 2)
-  ];
+class ItemListComponent implements OnDestroy, OnInit {
+  final ItemListService _itemListService;
+  StreamSubscription _itemsSubscription;
+  List<Item> itemsList = [];
+
+  ItemListComponent(this._itemListService);
+
+  @override
+  void ngOnInit() {
+    _itemListService.getAllItems();
+    _itemsSubscription = _itemListService.getItemUpdateListener
+        .listen((List<Item> items) => itemsList = items);
+  }
+
+  void ngOnDestroy() {
+    _itemsSubscription.cancel();
+  }
 }

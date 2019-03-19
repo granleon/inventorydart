@@ -10,5 +10,8 @@ import 'src/item_service.dart';
     styleUrls: ['app_component.css'],
     templateUrl: 'app_component.html',
     directives: [NavbarComponent, ContentComponent],
-    providers: [materialProviders, ClassProvider(ItemListService)])
+    providers: const <dynamic>[
+      materialProviders,
+      ClassProvider(ItemListService)
+    ])
 class AppComponent {}
