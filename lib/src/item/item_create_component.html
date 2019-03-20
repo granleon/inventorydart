@@ -8,30 +8,17 @@
     <form #itemForm="ngForm">
       <material-input
         autoFocus
-        label="Scan 2D Barcode"
+        label="Scan Barcode"
         floatingLabel
-        ngControl="barcode2d"
-        name="barcode2d"
-        #barcode2d
+        ngControl="barcode"
+        name="barcode"
+        #barcode
         style="width:90%"
         min="49"
         max="49"
         required
-      ></material-input>
-      <material-input
-        label="Scan 1D Barcode"
-        floatingLabel
-        ngControl="barcode1d"
-        name="barcode1d"
-        #barcode1d
-        style="width:90%"
-        required
-        min="15"
-        max="15"
         (keyup.enter)="addBarcode(itemForm)"
-      >
-      </material-input>
-
+      ></material-input>
       <material-fab
         mini
         raised
