@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 
+import schema from "./graphql/";
+
 const app = express();
 const PORT = process.env.PORT || "9001";
 const db = "mongodb://localhost:27017/inventory";
