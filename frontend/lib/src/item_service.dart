@@ -36,7 +36,7 @@ class ItemListService {
 
   Stream<List<Item>> get getItemUpdateListener => _itemUpdated.stream;
 
-  createItem(Item item) async {
+  createItem(String barcode) async {
     final response =
         await _http.post(baseurl, headers: _headers, body: json.encode(item));
     item = Item.fromJson(json.decode(response.body));
