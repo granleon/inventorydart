@@ -4,7 +4,6 @@ import 'package:angular_components/angular_components.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel.dart';
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
-import '../item_model.dart';
 import '../item_service.dart';
 
 @Component(
@@ -30,12 +29,11 @@ class ItemCreateComponent {
   ItemCreateComponent(this._itemListService);
 
   void addBarcode(NgForm form) {
-    // example scans
-    // 0115099590228729111803271720033110M803076
-    // +H6284659711L
-    // +$$3200331M803076LQ
-
     String barcode = form.value["barcode"];
+
+    if (barcode.length != 41) {
+      form.reset();
+    }
 
     _itemListService.createItem(barcode);
     form.reset();
