@@ -5,6 +5,7 @@ import 'package:angular_components/material_expansionpanel/material_expansionpan
 import 'package:angular_components/material_expansionpanel/material_expansionpanel_set.dart';
 
 import '../item_service.dart';
+import '../item_model.dart';
 
 @Component(
   selector: 'app-item-create',
@@ -25,15 +26,18 @@ import '../item_service.dart';
 )
 class ItemCreateComponent {
   final ItemListService _itemListService;
-
   ItemCreateComponent(this._itemListService);
 
   void addBarcode(NgForm form) {
-    String barcode = form.value["barcode"];
-
-    if (barcode.length != 41) {
+    String input = form.value["barcode"];
+    if (input.length != 41) {
       form.reset();
     }
+    String manufacture = input.substring(18, 24);
+    String expire = input.substring(26, 32);
+    String lotnumber = input.substring(34);
+
+    Item barcode = Item(null, manufacture, expire, lotnumber);
 
     _itemListService.createItem(barcode);
     form.reset();
