@@ -12,11 +12,13 @@
 <material-expansionpanel-set *ngIf="itemsList.isNotEmpty">
   <material-expansionpanel
     *ngFor="let item of itemsList"
-    name="{{ item.chemabbr }}"
+    name="{{ item.id }}"
     saveText="Details"
     cancelText="Close"
     flat
   >
-    Part Number: {{ item.partnumber }}
+    Manufacture: {{ item.manufacture }}
+    Lot Number: {{ item.lotnumber }}
+    Expires: {{ item.expire }}
   </material-expansionpanel>
 </material-expansionpanel-set>
