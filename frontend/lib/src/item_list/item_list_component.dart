@@ -36,7 +36,6 @@ class ItemListComponent implements OnDestroy, OnInit {
     _itemListService.getAllItems();
     _itemsSubscription = _itemListService.getItemUpdateListener
         .listen((List<Item> items) => itemsList = items);
-    print(itemsList);
   }
 
   void ngOnDestroy() {
