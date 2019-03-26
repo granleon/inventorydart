@@ -1,142 +1,148 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
 
-	// "github.com/gorilla/handlers"
-
-	// "github.com/globalsign/mgo/bson"
-	// "github.com/gorilla/mux"
-	"github.com/99designs/gqlgen/handler"
-	"github.com/gin-gonic/gin"
+	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
 )
 
-// var client *mongo.Client
+// Item struct
+type Item struct {
+	ID          bson.ObjectId `bson:"_id,omitempty" json:"id"`
+	Manufacture time.Time     `bson:"manufacture" json:"manufacture"`
+	Expire      time.Time     `bson:"expire" json:"expire"`
+	LotNumber   string        `bson:"lotnumber" json:"lotnumber"`
+}
 
-// // Item struct
-// type Item struct {
-// 	ID         primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-// 	LotNumber  string             `json:"lotnumber" bson:"lotnumber,omitempty"`
-// 	PartNumber string             `json:"partnumber" bson:"partnumber,omitempty"`
-// 	Chem       string             `json:"chem" bson:"chem,omitempty"`
-// 	ChemAbbr   string             `json:"chemabbr" bson:"chemabbr,omitempty"`
-// 	Expire     string             `json:"expire" bson:"expire,omitempty"`
-// }
+// Incoming struct
+type Incoming struct {
+	ID          bson.ObjectId
+	Manufacture string
+	Expire      string
+	LotNumber   string
+}
 
-// // CreateItem creates an item
-// func CreateItem(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("content-type", "application/json")
-// 	var item Item
-// 	err := json.NewDecoder(r.Body).Decode(&item)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Println("Unable to decode request body")
-// 	}
-// 	collection := client.Database("qc").Collection("inventory")
-// 	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+// DB struct
+type DB struct {
+	session    *mgo.Session
+	collection *mgo.Collection
+}
 
-// 	result, err := collection.InsertOne(ctx, bson.M{
-// 		"lotnumber":  item.LotNumber,
-// 		"partnumber": item.PartNumber,
-// 		"chem":       item.Chem,
-// 		"chemabbr":   item.ChemAbbr,
-// 		"expire":     item.Expire,
-// 	})
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Println("Error retrieving record")
-// 	}
-// 	json.NewEncoder(w).Encode(result)
-// }
+func strToDate(str string) time.Time {
+	month, _ := strconv.Atoi(str[2:4])
+	day, _ := strconv.Atoi(str[4:])
+	year, _ := strconv.Atoi(str[:2])
+	return time.Date(year+2000, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
 
-// // GetItem creates an item
-// func GetItem(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("content-type", "application/json")
-// 	params := mux.Vars(r)
-// 	id, _ := primitive.ObjectIDFromHex(params["id"])
-// 	var item Item
-// 	collection := client.Database("qc").Collection("inventory")
-// 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+func (db *DB) getAllItems(w http.ResponseWriter, r *http.Request) {
+	var items []Item
+	w.WriteHeader(http.StatusOK)
+	err := db.collection.Find(nil).All(&items)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(items)
+		w.Write(response)
+	}
+}
 
-// 	err := collection.FindOne(ctx, Item{ID: id}).Decode(&item)
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		w.Write([]byte(`{"message":"` + err.Error() + `"}`))
-// 	}
-// 	json.NewEncoder(w).Encode(item)
-// }
+func (db *DB) createItem(w http.ResponseWriter, r *http.Request) {
+	var incoming Incoming
+	itemBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(itemBody, &incoming)
 
-// // GetItems creates an item
-// func GetItems(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("content-type", "application/json")
-// 	var items []Item
-// 	collection := client.Database("qc").Collection("inventory")
-// 	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	var item Item
+	// create Hash ID for new item
+	item.ID = bson.NewObjectId()
+	item.Manufacture = strToDate(incoming.Manufacture)
+	item.Expire = strToDate(incoming.Expire)
 
-// 	cursor, err := collection.Find(ctx, bson.M{})
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Println("Error retrieving record")
-// 	}
-// 	defer cursor.Close(ctx)
-// 	for cursor.Next(ctx) {
-// 		var item Item
-// 		cursor.Decode(&item)
-// 		items = append(items, item)
-// 	}
-// 	if err := cursor.Err(); err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		w.Write([]byte(`{"message":"` + err.Error() + `"}`))
-// 	}
-// 	json.NewEncoder(w).Encode(items)
-// }
+	err := db.collection.Insert(item)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(item)
+		w.Write(response)
+	}
+}
 
-// // UpdateItem creates an item
-// func UpdateItem(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("UpdateItem placeholder")
-// }
+func (db *DB) updateItem(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var item Item
+	itemBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(itemBody, &item)
+	// create a Hash ID
+	err := db.collection.Update(bson.M{"_id": bson.ObjectIdHex(vars["id"])}, bson.M{"$set": &item})
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(err.Error()))
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "text")
+		w.Write([]byte("Update successfully"))
+	}
+}
 
-// // DeleteItem creates an item
-// func DeleteItem(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Println("DeleteItem placeholder")
-// }
+func (db *DB) deleteItem(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	err := db.collection.Remove(bson.M{"_id": bson.ObjectIdHex(vars["id"])})
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(err.Error()))
+	} else {
+		w.Header().Set("Content-Type", "text")
+		w.Write([]byte("Deleted sucessfully"))
+	}
+}
 
-// func main() {
-// 	fmt.Println("Starting the application....on port localhost:9001/api/v1/item")
-// 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+func (db *DB) getItem(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var post Item
 
-// 	client, _ = mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
-// 	fmt.Println("Connected to MongoDB...")
-
-// 	originsOk := handlers.AllowedOrigins([]string{"*"})
-// 	headersOk := handlers.AllowedHeaders([]string{"Origin", "X-Requested-With", "Content-Type", "Accept"})
-// 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
-
-// 	router := mux.NewRouter()
-// 	router.HandleFunc("/api/v1/item/{id}", GetItem).Methods("GET")
-// 	router.HandleFunc("/api/v1/item", CreateItem).Methods("POST")
-// 	router.HandleFunc("/api/v1/item/{id}", UpdateItem).Methods("PATCH")
-// 	router.HandleFunc("/api/v1/item/{id}", DeleteItem).Methods("DELETE")
-// 	router.HandleFunc("/api/v1/item", GetItems).Methods("GET")
-// 	log.Fatal(http.ListenAndServe(":9001", handlers.LoggingHandler(os.Stdout, handlers.CORS(originsOk, headersOk, methodsOk)(router))))
-// }
-
-// func graphqlHandler() gin.HandlerFunc {
-// 	h := handler.GraphQL(NewExecutableSchema(Config{Resolvers: &Resolver{}}))
-// 	return func(c *gin.Context) {
-// 		h.ServeHTTP(c.Writer, c.Request)
-// 	}
-// }
-
-func playgroundHandler() gin.HandlerFunc {
-	h := handler.Playground("GraphQL", "/query")
-	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
+	w.WriteHeader(http.StatusOK)
+	err := db.collection.Find(bson.M{"_id": bson.ObjectIdHex(vars["id"])}).One(&post)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(post)
+		w.Write(response)
 	}
 }
 
 func main() {
-	r := gin.Default()
-	// r.POST("/query", graphqlHandler())
-	r.GET("/", playgroundHandler())
-	r.Run()
+	session, err := mgo.Dial("localhost:27017")
+	collection := session.DB("qc").C("inventory")
+	db := &DB{session: session, collection: collection}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("[Connected] to MongoDB")
+
+	defer session.Close()
+
+	originsOk := handlers.AllowedOrigins([]string{"*"})
+	headersOk := handlers.AllowedHeaders([]string{"Origin", "X-Requested-With", "Content-Type", "Accept"})
+	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"})
+
+	router := mux.NewRouter()
+	router.HandleFunc("/api/v1/item/{id}", db.getItem).Methods("GET")
+	router.HandleFunc("/api/v1/item", db.createItem).Methods("POST")
+	router.HandleFunc("/api/v1/item/{id}", db.updateItem).Methods("PATCH")
+	router.HandleFunc("/api/v1/item/{id}", db.deleteItem).Methods("DELETE")
+	router.HandleFunc("/api/v1/item", db.getAllItems).Methods("GET")
+	log.Fatal(http.ListenAndServe(":9001", handlers.LoggingHandler(os.Stdout, handlers.CORS(originsOk, headersOk, methodsOk)(router))))
 }
